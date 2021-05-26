@@ -1,0 +1,237 @@
+@extends('layouts.adminapp', ['activePage' => 'pos', 'titlePage' => __('Positions')])
+
+@section('content')
+<div class="content">
+  <div class="container-fluid">
+    @if (Session::has('success'))
+                   <div class="row" id="successMessage">
+                    <div class="col-sm-12">
+                      <div class="alert alert-success">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <i class="material-icons">close</i>
+                        </button>
+                        <span>{{ session('success') }}</span>
+                      </div>
+                    </div>
+                  </div>   
+               @endif
+    <div class="row">
+      <div class="col-md-12">
+          <div class="card">
+            <div class="card-header card-header-primary">
+              <h4 class="card-title ">Positions</h4>
+              <p class="card-category"> Here you can manage positions
+              </p>
+            </div>
+            <div class="card-body">
+              
+              <div class="row">
+                <div class="col-12 text-right">
+
+                 <!--  <a href="{{ route('position.postype') }}" class="btn btn-sm btn-primary">Position Type</a> -->
+                  <a href="{{ route('positions.create') }}" class="btn btn-sm btn-primary">Create Position</a>
+
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table tablemanager">
+                  <thead class=" text-primary">
+
+                 
+                    <tr><th>
+                       Position Name
+                    </th>
+                    <th>
+                      Type
+                    </th>
+                    <th>
+                      Category
+                    </th>
+                    <th class="text-right">
+                      Actions
+                    </th>
+                  </tr></thead>
+                  <tbody>
+                      @foreach ($positions as $position)
+                        <tr>
+                        <td>
+                            {{$position->position}}
+                        </td>
+                        <td>
+                          @foreach ($position_type as $type)
+                            @if ($position->type == $type->id)
+                            {{$type->type}}
+                            @endif
+                          @endforeach
+                        </td>
+                        <td>
+                          @foreach ($employee_categ as $categ)
+                            @if($position->categ_id==$categ->id)
+                            {{$categ->category}}
+                            @endif
+                          @endforeach
+                        </td>
+                        <td class="td-actions text-right">
+                          <?php $withpos=0; ?>
+                            @foreach($service_record as $record)
+                              @if($record->pos_id == $position->id)
+                                <?php $withpos++; ?>
+                              @endif
+                            @endforeach
+                            @if($withpos==0)
+                            <a rel="tooltip" class="btn btn-success btn-link" href="" data-original-title="" title="" data-toggle="modal" data-target=".edit-{{$position->id}}">
+                              <i class="material-icons">edit</i>
+                              <div class="ripple-container"></div>
+                            </a>
+                            
+                            <a rel="tooltip" class="btn btn-danger btn-link" href="" data-original-title="" title="" data-toggle="modal" data-target=".delete-{{$position->id}}">
+                              <i class="material-icons">delete</i>
+                              <div class="ripple-container"></div>
+                            </a>
+                            @endif
+                        </td>
+                      </tr>
+
+                      <div class="modal fade edit-{{$position->id}}" tabindex="-1" id="mymodal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <form action="{{route('position.edit', $position->id)}}" method="post">
+                                      @csrf
+                                      @method('post')
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Edit Position</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="form-group">
+                                      <div class="modal-body">
+                                      <div class="row">
+                                        <div class="col-sm-12">
+                                          <label class="col-form-label">{{ __('Position Name') }}</label>
+                                          <input class="form-control" type="text"  name="posname" id="posname" required value="{{$position->position}}">
+                                          </div>
+                                     <br>
+                                    <div class="col-sm-6 ">
+                                      <label class="col-form-label">{{ __('Position Type') }}</label>
+                                      <!-- <input class="form-control" type="text"  name="deptname" id="deptname" required> -->
+
+                                      <select class="form-control" name="postype">
+                                        @foreach ($position_type as $type)
+                                        <option  value="{{$type->id}}"
+                                          <?php
+                                            if($position->type == $type->id)
+                                            {
+                                              echo "selected";
+                                            }
+                                          ?>
+
+                                          >{{$type->type}}</option>
+                                        @endforeach
+                                      </select>
+                                    </div>
+                                          <div class="col-sm-6 ">
+                                            <label class="col-form-label">{{ __('Category') }}</label>
+                                            <!-- <input class="form-control" type="text"  name="deptname" id="deptname" required> -->
+
+                                            <select class="form-control" name="category">
+                                              @foreach ($employee_categ as $categ)
+                                              <option value="{{$categ->id}}"
+
+                                                <?php
+                                                  if($position->categ_id == $categ->id)
+                                                  {
+                                                    echo "selected";
+                                                  }
+                                                ?>
+                                                >{{$categ->category}}</option>
+                                              @endforeach
+                                            </select>
+                                          </div>
+                                      </div>
+                                      </div>
+                                      </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                                      <button type="submit" class="btn btn-success" style="color:white;">Save</button>
+                                      
+                                    </div>
+                                  </form>
+                                  </div>
+                                </div>
+                      </div>
+
+                      <div class="modal fade delete-{{$position->id}}" tabindex="-1" id="mymodal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <form action="{{route('position.delete', $position->id)}}" method="">
+                                      @csrf
+                                      @method('post')
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Delete Position</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="form-group">
+                                      <div class="modal-body">
+                                      <p>Are you sure you wanted to delete this position?
+                                      </p>
+                                      <p>{{$position->position}}</p>
+                                    </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                                      <button type="submit" class="btn btn-danger" style="color:white;">Delete</button>
+                                      
+                                    </div>
+                                  </form>
+                                  </div>
+                                </div>
+                      </div>
+                      @endforeach 
+           
+            
+                    </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+               
+      </div>
+    </div>
+    <div class="row float-right">
+                  <div class="col-sm-12 text-right">
+                  
+                  </div>
+            </div>
+  </div>
+</div>
+<script>
+  setTimeout(function() {
+    $('#successMessage').fadeOut('fast');
+}, 5000); // <-- time in milliseconds
+</script>
+<script type="text/javascript" src="{{ asset('material') }}/js/tableManager.js"></script>
+<script type="text/javascript">
+    // basic usage
+    $('.tablemanager').tablemanager({
+      firstSort: [[1,'asc']],
+      disable: ["last"],
+      appendFilterby: true,
+      dateFormat: [[4,"mm-dd-yyyy"]],
+      debug: true,
+      vocabulary: {
+    voc_filter_by: 'Filter By',
+    voc_type_here_filter: 'Search...',
+    voc_show_rows: '  Rows Per Page'
+  },
+      pagination: true,
+      showrows: [5,10,15,20],
+      disableFilterBy: [4]
+    });
+    // $('.tablemanager').tablemanager();
+  </script>
+@endsection
