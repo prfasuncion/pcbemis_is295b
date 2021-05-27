@@ -58,7 +58,7 @@
                	<?php $count_job++;?>
                   <tr>
                     <td width="20%">
-                    	<img src="https://cewit.indiana.edu/images/news/hiring.png" width="150px" height="80px">
+                    	<img src="{{ asset('material') }}/img/hiring.png" width="150px" height="80px">
                      
                     </td>
                     <td align="left">

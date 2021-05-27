@@ -22,17 +22,18 @@ Route::get('logout', 'App\Http\Controllers\Auth\LoginController@logout');
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin');
+
 Route::get('/jobs', [App\Http\Controllers\JobOppController::class, 'jobs'])->name('jobs');
 Route::get('/jobs/{id}', [App\Http\Controllers\JobOppController::class, 'jobs_view'])->name('jobs.view');
 Route::post('/jobs/{id}/apply', [App\Http\Controllers\JobOppController::class, 'apply'])->name('jobs.apply');
 
 Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('home')->middleware('auth');
+Route::get('admin', 'App\Http\Controllers\AdminController@index')->name('admin');
 
 Route::group(['middleware' => ['role:superadministrator']], function () {
 
 Route::group(['middleware' => 'auth'], function () {
-
+Route::get('admin', 'App\Http\Controllers\AdminController@index')->name('admin');
 Route::post('users/suspend/{id}', 'App\Http\Controllers\UserController@inactivate')->name('user.inactivate');
 Route::post('users/reactivate/{id}', 'App\Http\Controllers\UserController@reactivate')->name('user.reactivate');
 Route::get('users/edit/{id}', 'App\Http\Controllers\UserController@edit')->name('user.edit');
